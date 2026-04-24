@@ -1,0 +1,154 @@
+/* PAGE WRAPPER */
+.lr-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+  font-family: 'Segoe UI', sans-serif;
+}
+
+/* Centers the form below the navbar */
+.lr-body {
+  display: flex;
+  justify-content: center;
+  padding: 40px 20px 60px;
+}
+
+/* MAIN CONTAINER */
+.container {
+  width: 380px;
+  background: #121212;
+  padding: 40px;
+  border-radius: 20px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(10px);
+}
+
+/* HEADER */
+.header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.text {
+  font-size: 28px;
+  font-weight: 700;
+  background: linear-gradient(45deg, #00ff88, #00c6ff);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.underline {
+  width: 50px;
+  height: 3px;
+  background: #00ff88;
+  border-radius: 10px;
+}
+
+/* INPUTS */
+.inputs {
+  margin-top: 25px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 8px;
+}
+
+.input {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: 50px;
+  border-radius: 12px;
+  background: #1e1e1e;
+  padding: 0 15px;
+  gap: 10px;
+  transition: 0.3s;
+  box-sizing: border-box;
+  border: 1px solid transparent;
+}
+
+.input:focus-within {
+  border: 1px solid #00ff88;
+  box-shadow: 0 0 10px rgba(0, 255, 136, 0.4);
+}
+
+.input.input-error {
+  border: 1px solid #ff4d4d;
+}
+
+.input-icon {
+  color: rgba(255, 255, 255, 0.5);
+  flex-shrink: 0;
+}
+
+.input input {
+  background: transparent;
+  border: none;
+  outline: none;
+  width: 100%;
+  color: white;
+  font-size: 15px;
+}
+
+/* Validation error */
+.field-error {
+  color: #ff4d4d;
+  font-size: 12px;
+  margin: 0;
+  padding-left: 4px;
+}
+
+/* FORGOT PASSWORD */
+.forgot-password {
+  color: #aaa;
+  font-size: 14px;
+  margin-top: 10px;
+}
+
+.forgot-link {
+  color: #00ff88;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.forgot-link:hover {
+  text-decoration: underline;
+}
+
+/* BUTTONS */
+.button {
+  display: flex;
+  gap: 15px;
+  margin: 30px auto 0;
+  width: 100%;
+}
+
+.submit {
+  flex: 1;
+  height: 45px;
+  border-radius: 25px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  color: white;
+  background: linear-gradient(45deg, #00ff88, #00c6ff);
+  transition: 0.3s;
+}
+
+.submit:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 15px rgba(0, 255, 136, 0.5);
+}
+
+.gray {
+  background: #2a2a2a;
+  color: #888;
+}
