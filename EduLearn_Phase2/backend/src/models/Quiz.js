@@ -1,4 +1,4 @@
-// src/models/Quiz.js
+// src/models/Quiz.js  (UPDATED — adds isGlobal flag)
 const mongoose = require('mongoose');
 
 const questionSchema = new mongoose.Schema({
@@ -14,11 +14,15 @@ const quizSchema = new mongoose.Schema(
     title:       { type: String, required: [true, 'Title is required'], trim: true },
     description: { type: String, default: '' },
     timeLimit:   { type: Number, default: 0 }, // seconds; 0 = no limit
+    dueDate:     { type: Date,   default: null },
     course: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'Course',
+      ref:  'Course',
       default: null,
     },
+    // isGlobal = true → shown to ALL students regardless of enrollment
+    // isGlobal = false (default) → only shown to students enrolled in `course`
+    isGlobal: { type: Boolean, default: false },
     questions: [questionSchema],
   },
   { timestamps: true }

@@ -10,10 +10,32 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
-import { Mail, Phone, Calendar, BookOpen, Upload, Edit2, Save, X } from 'lucide-react';
+import { Mail, Phone, Calendar, BookOpen, Upload, Edit2, Save, X, Plus, Trash2 } from 'lucide-react';
 import Sidebar from '../components/Sidebar';
 import { useAuth } from '../context/AuthContext';
 import { usersApi } from '../hooks/useApi';
+
+// ── Skill suggestions by role ─────────────────────────────────────────────────
+const SKILL_SUGGESTIONS = {
+  student: [
+    'Machine Learning', 'Deep Learning', 'Data Structures', 'Algorithms',
+    'Problem Solving', 'Python', 'JavaScript', 'React', 'Node.js', 'SQL',
+    'Database Design', 'Computer Networks', 'Operating Systems', 'C++', 'Java',
+    'Web Development', 'Mobile Development', 'Cybersecurity', 'Cloud Computing',
+    'Software Engineering', 'Critical Thinking', 'Team Collaboration',
+  ],
+  instructor: [
+    'Curriculum Design', 'Machine Learning', 'Deep Learning', 'Data Science',
+    'Software Architecture', 'Database Systems', 'Web Technologies', 'Python',
+    'Java', 'C++', 'Research', 'Academic Writing', 'Public Speaking',
+    'Project Management', 'Mentorship', 'Cloud Computing', 'DevOps',
+    'Cybersecurity', 'Computer Vision', 'Natural Language Processing',
+  ],
+  admin: [
+    'System Administration', 'Project Management', 'Team Leadership',
+    'Data Analysis', 'Communication', 'Problem Solving',
+  ],
+};
 
 const profileSchema = Yup.object({
   name:        Yup.string().min(2).max(60).required('Full name is required'),
@@ -25,11 +47,19 @@ const profileSchema = Yup.object({
 
 export default function ProfilePage({ isDarkMode, toggleTheme }) {
   const { user, updateUser } = useAuth();
-  const [isEditing,  setIsEditing]  = useState(false);
-  const [previewPic, setPreviewPic] = useState(null);
-  const [avatarFile, setAvatarFile] = useState(null);
+  const [isEditing,   setIsEditing]   = useState(false);
+  const [previewPic,  setPreviewPic]  = useState(null);
+  const [avatarFile,  setAvatarFile]  = useState(null);
   const [enrollments, setEnrollments] = useState([]);
   const [serverError, setServerError] = useState('');
+
+  // Skills state — managed separately from formik
+  const [skills,      setSkills]      = useState(user?.skills || []);
+  const [skillInput,  setSkillInput]  = useState('');
+  const [showSuggestions, setShowSuggestions] = useState(false);
+
+  // Keep skills in sync with user object
+  useEffect(() => { setSkills(user?.skills || []); }, [user]);
 
   useEffect(() => {
     usersApi.getMyEnrollments()
@@ -52,6 +82,8 @@ export default function ProfilePage({ isDarkMode, toggleTheme }) {
       try {
         const fd = new FormData();
         Object.entries(values).forEach(([k, v]) => fd.append(k, v));
+        // Append each skill individually so the backend receives skills[]
+        skills.forEach(s => fd.append('skills', s));
         if (avatarFile) fd.append('avatar', avatarFile);
         const updated = await usersApi.updateMe(fd);
         updateUser(updated);
@@ -66,6 +98,9 @@ export default function ProfilePage({ isDarkMode, toggleTheme }) {
 
   const handleCancel = () => {
     formik.resetForm();
+    setSkills(user?.skills || []);
+    setSkillInput('');
+    setShowSuggestions(false);
     setPreviewPic(null);
     setAvatarFile(null);
     setIsEditing(false);
@@ -80,6 +115,26 @@ export default function ProfilePage({ isDarkMode, toggleTheme }) {
     reader.onloadend = () => setPreviewPic(reader.result);
     reader.readAsDataURL(file);
   };
+
+  // Skill helpers
+  const addSkill = (skill) => {
+    const trimmed = skill.trim();
+    if (!trimmed || skills.includes(trimmed)) return;
+    setSkills(prev => [...prev, trimmed]);
+    setSkillInput('');
+    setShowSuggestions(false);
+  };
+
+  const removeSkill = (skill) => setSkills(prev => prev.filter(s => s !== skill));
+
+  const handleSkillKeyDown = (e) => {
+    if (e.key === 'Enter') { e.preventDefault(); addSkill(skillInput); }
+    if (e.key === 'Escape') { setShowSuggestions(false); }
+  };
+
+  const suggestions = SKILL_SUGGESTIONS[user?.role || 'student']
+    .filter(s => s.toLowerCase().includes(skillInput.toLowerCase()) && !skills.includes(s))
+    .slice(0, 8);
 
   const avatarSrc = previewPic
     || (user?.profilePicture ? `http://localhost:5000${user.profilePicture}` : '')
@@ -246,13 +301,71 @@ export default function ProfilePage({ isDarkMode, toggleTheme }) {
               {/* Skills */}
               <div>
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Skills</h3>
-                <div className="flex flex-wrap gap-2">
-                  {user?.skills?.length > 0 ? user.skills.map((skill, i) => (
-                    <Badge key={i} className="bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">
+
+                {/* Current skills */}
+                <div className="flex flex-wrap gap-2 mb-4 min-h-[2rem]">
+                  {skills.length > 0 ? skills.map((skill, i) => (
+                    <span key={i}
+                      className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">
                       {skill}
-                    </Badge>
-                  )) : <p className="text-gray-500 dark:text-gray-400 text-sm">No skills added yet.</p>}
+                      {isEditing && (
+                        <button onClick={() => removeSkill(skill)} className="hover:text-red-500 transition-colors">
+                          <X className="w-3 h-3" />
+                        </button>
+                      )}
+                    </span>
+                  )) : (
+                    <p className="text-gray-500 dark:text-gray-400 text-sm">
+                      {isEditing ? 'Add your skills below.' : 'No skills added yet.'}
+                    </p>
+                  )}
                 </div>
+
+                {/* Skill input — only in edit mode */}
+                {isEditing && (
+                  <div className="relative">
+                    <div className="flex gap-2">
+                      <input
+                        value={skillInput}
+                        onChange={e => { setSkillInput(e.target.value); setShowSuggestions(true); }}
+                        onKeyDown={handleSkillKeyDown}
+                        onFocus={() => setShowSuggestions(true)}
+                        onBlur={() => setTimeout(() => setShowSuggestions(false), 150)}
+                        placeholder="Type a skill and press Enter…"
+                        className="flex-1 px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => addSkill(skillInput)}
+                        disabled={!skillInput.trim()}
+                        className="flex items-center gap-1 px-3 py-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-40 text-white rounded-lg text-sm transition-colors"
+                      >
+                        <Plus className="w-4 h-4" /> Add
+                      </button>
+                    </div>
+
+                    {/* Suggestions dropdown */}
+                    {showSuggestions && suggestions.length > 0 && (
+                      <div className="absolute top-full left-0 right-0 mt-1 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-10 overflow-hidden">
+                        <p className="text-xs text-gray-400 px-3 pt-2 pb-1">Suggestions</p>
+                        {suggestions.map(s => (
+                          <button
+                            key={s}
+                            type="button"
+                            onMouseDown={() => addSkill(s)}
+                            className="w-full text-left px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                          >
+                            {s}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+
+                    <p className="text-xs text-gray-400 mt-1.5">
+                      Press Enter or click Add. Click a suggestion to add it instantly.
+                    </p>
+                  </div>
+                )}
               </div>
 
               <Separator className="dark:bg-gray-800" />
@@ -267,7 +380,7 @@ export default function ProfilePage({ isDarkMode, toggleTheme }) {
                     {enrollments.map((e) => (
                       <div key={e._id} className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900 rounded-lg">
                         <div className="flex items-center gap-3">
-                          <BookOpen className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                          <BookOpen className="h-5 w-5 text-blue-600 dark:text-blue-400 flex-shrink-0" />
                           <div>
                             <span className="font-medium text-gray-900 dark:text-white">{e.course?.title}</span>
                             <p className="text-xs text-gray-500 dark:text-gray-400">{e.course?.instructor}</p>

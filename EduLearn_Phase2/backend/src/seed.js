@@ -268,7 +268,26 @@ async function seed() {
     console.log(`✓ Seeded ${insertedCourses.length} courses (linked to ${instructor.name})`);
 
     // 4. Insert quizzes (linked to first course)
-    const quizzesWithCourse = quizzes.map(q => ({ ...q, course: insertedCourses[0]._id }));
+    // Link React quiz to Web Development course (index 3 = CS302) and mark as course-specific
+  // Also add a global entry quiz visible to everyone
+  const webCourse = insertedCourses.find(c => c.code === 'CS302') || insertedCourses[0];
+  const quizzesWithCourse = [
+    { ...quizzes[0], course: webCourse._id, isGlobal: false },
+    {
+      title: 'General Programming Entry Quiz',
+      description: 'A baseline quiz to assess your programming fundamentals. Available to all students.',
+      timeLimit: 300,
+      isGlobal: true,
+      course: null,
+      questions: [
+        { questionId: 1, type: 'multiple-choice', question: 'What does CPU stand for?', options: ['Central Processing Unit', 'Computer Personal Unit', 'Central Program Utility', 'Core Processing Unit'], correctAnswer: 'Central Processing Unit' },
+        { questionId: 2, type: 'true-false', question: 'An algorithm must always be written in a programming language.', options: ['True', 'False'], correctAnswer: 'False' },
+        { questionId: 3, type: 'multiple-choice', question: 'Which data structure uses LIFO order?', options: ['Queue', 'Stack', 'Array', 'Linked List'], correctAnswer: 'Stack' },
+        { questionId: 4, type: 'true-false', question: 'RAM is a type of permanent storage.', options: ['True', 'False'], correctAnswer: 'False' },
+        { questionId: 5, type: 'multiple-choice', question: 'What is the time complexity of binary search?', options: ['O(n)', 'O(n²)', 'O(log n)', 'O(1)'], correctAnswer: 'O(log n)' },
+      ],
+    },
+  ];
     await Quiz.insertMany(quizzesWithCourse);
     console.log(`✓ Seeded ${quizzes.length} quizzes`);
 

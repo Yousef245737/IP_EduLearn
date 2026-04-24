@@ -22,6 +22,7 @@ const Icons = {
   calendar: 'M3 9h18M3 4h18v16H3zM8 2v4M16 2v4',
   arrowLeft:'M19 12H5M12 5l-7 7 7 7',
   link:     'M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71',
+  file:     'M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8zM14 2v6h6M16 13H8M16 17H8M10 9H8',
 };
 
 const ProgressBar = ({ value }) => (
@@ -311,6 +312,26 @@ export default function CourseDetailsPage({ isDarkMode, toggleTheme }) {
 
                 {/* ── Video Player ── */}
                 <VideoPlayer url={currentLesson.videoUrl} title={currentLesson.title} />
+
+                {/* ── Lecture Documents / PDFs ── */}
+                {currentLesson.resources && currentLesson.resources.filter(r => r.url).length > 0 && (
+                  <div className="flex flex-wrap gap-2 mb-5">
+                    {currentLesson.resources.filter(r => r.url).map((res, i) => (
+                      <a
+                        key={i}
+                        href={res.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-700 text-orange-700 dark:text-orange-400 text-sm font-medium hover:bg-orange-100 dark:hover:bg-orange-900/40 transition-colors"
+                      >
+                        <svg width="15" height="15" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
+                          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8zM14 2v6h6M16 13H8M16 17H8M10 9H8" />
+                        </svg>
+                        {res.name || 'Lecture Document'}
+                      </a>
+                    ))}
+                  </div>
+                )}
 
                 {currentLesson.description && (
                   <div className="mb-5">

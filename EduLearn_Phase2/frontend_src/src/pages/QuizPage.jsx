@@ -149,22 +149,33 @@ export default function QuizPage({ isDarkMode, toggleTheme }) {
           <div className="text-center py-12">
             <BookOpen className="w-12 h-12 text-gray-400 mx-auto mb-4" />
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">No quizzes available</h3>
-            <p className="text-gray-500 dark:text-gray-400">Check back later for new quizzes.</p>
+            <p className="text-gray-500 dark:text-gray-400">Enroll in courses to access their quizzes, or check back for global quizzes.</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {quizzes.map(quiz => (
-              <Card key={quiz._id} className="bg-white dark:bg-gray-950 border-gray-200 dark:border-gray-800 hover:shadow-lg transition-shadow">
+              <Card key={quiz._id} className="bg-white dark:bg-gray-950 border-gray-200 dark:border-gray-800 hover:shadow-lg transition-shadow flex flex-col">
                 <CardHeader>
-                  <CardTitle className="text-gray-900 dark:text-white">{quiz.title}</CardTitle>
+                  <div className="flex items-start justify-between gap-2">
+                    <CardTitle className="text-gray-900 dark:text-white text-base leading-snug">{quiz.title}</CardTitle>
+                    {quiz.isGlobal ? (
+                      <span className="flex-shrink-0 text-xs font-semibold px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400">Global</span>
+                    ) : quiz.course ? (
+                      <span className="flex-shrink-0 text-xs font-semibold px-2 py-0.5 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 truncate max-w-[120px]" title={quiz.course.title}>{quiz.course.code}</span>
+                    ) : null}
+                  </div>
+                  {quiz.course && !quiz.isGlobal && (
+                    <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">{quiz.course.title}</p>
+                  )}
                   {quiz.description && (
-                    <CardDescription className="text-gray-500 dark:text-gray-400">{quiz.description}</CardDescription>
+                    <CardDescription className="text-gray-500 dark:text-gray-400 text-sm mt-1">{quiz.description}</CardDescription>
                   )}
                 </CardHeader>
-                <CardContent>
+                <CardContent className="flex-1">
                   <div className="flex gap-4 text-sm text-gray-500 dark:text-gray-400">
                     <span>{quiz.questions?.length || 0} questions</span>
                     {quiz.timeLimit > 0 && <span>{formatTime(quiz.timeLimit)} limit</span>}
+                    {quiz.dueDate && <span className="text-orange-500">Due {new Date(quiz.dueDate).toLocaleDateString()}</span>}
                   </div>
                 </CardContent>
                 <CardFooter>

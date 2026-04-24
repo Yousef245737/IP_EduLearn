@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
   ArrowLeft, Save, Plus, Trash2, ChevronDown, ChevronUp,
-  Users, FileText, Loader2, BookOpen,
+  Users, FileText, Loader2, BookOpen, Link,
 } from 'lucide-react';
 import InstructorSidebar from '../../components/InstructorSidebar';
 import { useAuth } from '../../context/AuthContext';
@@ -113,6 +113,12 @@ export default function InstructorCourse({ isDarkMode, toggleTheme }) {
   const removeLesson = (wi, li) =>
     setWeeks(w => w.map((wk, i) => i !== wi ? wk : { ...wk, lessons: wk.lessons.filter((_, j) => j !== li) }));
 
+  const addResource    = (wi, li) =>
+    setWeeks(w => w.map((wk, i) => i !== wi ? wk : { ...wk, lessons: wk.lessons.map((ls, j) => j !== li ? ls : { ...ls, resources: [...(ls.resources || []), { name: '', url: '' }] }) }));
+  const removeResource = (wi, li, ri) =>
+    setWeeks(w => w.map((wk, i) => i !== wi ? wk : { ...wk, lessons: wk.lessons.map((ls, j) => j !== li ? ls : { ...ls, resources: ls.resources.filter((_, k) => k !== ri) }) }));
+  const updateResource = (wi, li, ri, field, val) =>
+    setWeeks(w => w.map((wk, i) => i !== wi ? wk : { ...wk, lessons: wk.lessons.map((ls, j) => j !== li ? ls : { ...ls, resources: ls.resources.map((r, k) => k !== ri ? r : { ...r, [field]: val }) }) }));
   const updateLesson = (wi, li, field, val) =>
     setWeeks(w => w.map((wk, i) => i !== wi ? wk : {
       ...wk,
@@ -281,6 +287,22 @@ export default function InstructorCourse({ isDarkMode, toggleTheme }) {
                                   placeholder="🎬 Video URL — YouTube, Vimeo, or direct .mp4 link"
                                   className="w-full text-xs bg-white dark:bg-gray-800 border border-blue-200 dark:border-blue-700 rounded px-2 py-1 text-blue-600 dark:text-blue-400 focus:outline-none focus:ring-1 focus:ring-emerald-400"
                                 />
+                                {/* Resources / PDFs */}
+                                <div className="space-y-1.5">
+                                  {(lesson.resources || []).map((res, ri) => (
+                                    <div key={ri} className="flex items-center gap-1.5">
+                                      <FileText className="w-3 h-3 text-orange-500 flex-shrink-0" />
+                                      <input value={res.name} onChange={e => updateResource(wi, li, ri, 'name', e.target.value)} placeholder="Label (e.g. Lecture Slides)"
+                                        className="w-28 text-xs bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded px-2 py-1 text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-1 focus:ring-orange-400" />
+                                      <input value={res.url} onChange={e => updateResource(wi, li, ri, 'url', e.target.value)} placeholder="PDF or doc URL"
+                                        className="flex-1 text-xs bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded px-2 py-1 text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-1 focus:ring-orange-400" />
+                                      <button type="button" onClick={() => removeResource(wi, li, ri)} className="text-red-400 hover:text-red-600"><Trash2 className="w-3 h-3" /></button>
+                                    </div>
+                                  ))}
+                                  <button type="button" onClick={() => addResource(wi, li)} className="flex items-center gap-1 text-xs text-orange-600 dark:text-orange-400 hover:underline">
+                                    <Plus className="w-3 h-3" /> Add Document / PDF
+                                  </button>
+                                </div>
                               </div>
                             ))}
                           </div>

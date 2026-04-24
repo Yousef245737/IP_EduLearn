@@ -1,6 +1,6 @@
 // src/pages/admin/AdminCourses.jsx
 import { useState, useEffect, useCallback } from 'react';
-import { Search, Plus, Pencil, Trash2, X, Check, Loader2, ChevronDown, ChevronUp, BookOpen } from 'lucide-react';
+import { Search, Plus, Pencil, Trash2, X, Check, Loader2, ChevronDown, ChevronUp, BookOpen, FileText, Link } from 'lucide-react';
 import AdminSidebar from '../../components/AdminSidebar';
 import { useAuth } from '../../context/AuthContext';
 
@@ -39,6 +39,9 @@ function WeeksEditor({ weeks, onChange }) {
   const removeWeek = (wi) => onChange(weeks.filter((_, i) => i !== wi));
   const updateWeek = (wi, field, val) => onChange(weeks.map((w, i) => i !== wi ? w : { ...w, [field]: val }));
   const addLesson = (wi) => onChange(weeks.map((w, i) => i !== wi ? w : { ...w, lessons: [...w.lessons, EMPTY_LESSON()] }));
+  const addResource = (wi, li) => onChange(weeks.map((w, i) => i !== wi ? w : { ...w, lessons: w.lessons.map((ls, j) => j !== li ? ls : { ...ls, resources: [...(ls.resources || []), { name: '', url: '' }] }) }));
+  const removeResource = (wi, li, ri) => onChange(weeks.map((w, i) => i !== wi ? w : { ...w, lessons: w.lessons.map((ls, j) => j !== li ? ls : { ...ls, resources: ls.resources.filter((_, k) => k !== ri) }) }));
+  const updateResource = (wi, li, ri, field, val) => onChange(weeks.map((w, i) => i !== wi ? w : { ...w, lessons: w.lessons.map((ls, j) => j !== li ? ls : { ...ls, resources: ls.resources.map((r, k) => k !== ri ? r : { ...r, [field]: val }) }) }));
   const removeLesson = (wi, li) => onChange(weeks.map((w, i) => i !== wi ? w : { ...w, lessons: w.lessons.filter((_, j) => j !== li) }));
   const updateLesson = (wi, li, field, val) => onChange(weeks.map((w, i) => i !== wi ? w : { ...w, lessons: w.lessons.map((ls, j) => j !== li ? ls : { ...ls, [field]: val }) }));
 
@@ -97,6 +100,22 @@ function WeeksEditor({ weeks, onChange }) {
                       <input value={lesson.videoUrl || ''} onChange={e => updateLesson(wi, li, 'videoUrl', e.target.value)}
                         placeholder="🎬 Video URL — YouTube, Vimeo, or direct .mp4 link"
                         className="w-full text-xs bg-white dark:bg-gray-800 border border-blue-200 dark:border-blue-700 rounded px-2 py-1 text-blue-600 dark:text-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-400" />
+                      {/* Resources */}
+                      <div className="space-y-1">
+                        {(lesson.resources || []).map((res, ri) => (
+                          <div key={ri} className="flex items-center gap-1.5">
+                            <FileText className="w-3 h-3 text-orange-500 flex-shrink-0" />
+                            <input value={res.name} onChange={e => updateResource(wi, li, ri, 'name', e.target.value)} placeholder="Label (e.g. Lecture Slides)"
+                              className="w-28 text-xs bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded px-2 py-1 text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-1 focus:ring-orange-400" />
+                            <input value={res.url} onChange={e => updateResource(wi, li, ri, 'url', e.target.value)} placeholder="PDF or doc URL"
+                              className="flex-1 text-xs bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded px-2 py-1 text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-1 focus:ring-orange-400" />
+                            <button type="button" onClick={() => removeResource(wi, li, ri)} className="text-red-400 hover:text-red-600 flex-shrink-0"><Trash2 className="w-3 h-3" /></button>
+                          </div>
+                        ))}
+                        <button type="button" onClick={() => addResource(wi, li)} className="flex items-center gap-1 text-xs text-orange-600 dark:text-orange-400 hover:underline mt-0.5">
+                          <Plus className="w-3 h-3" /> Add Document / PDF
+                        </button>
+                      </div>
                     </div>
                   ))}
                 </div>
