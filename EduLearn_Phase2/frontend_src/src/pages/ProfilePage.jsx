@@ -147,7 +147,7 @@ export default function ProfilePage({ isDarkMode, toggleTheme }) {
     value:    formik.values[name],
     onChange: formik.handleChange,
     onBlur:   formik.handleBlur,
-    className: `mt-1 dark:bg-gray-900 dark:border-gray-700 ${formik.touched[name] && formik.errors[name] ? 'border-red-500' : ''}`,
+    className: `mt-1 dark:bg-gray-900 dark:border-gray-700 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 ${formik.touched[name] && formik.errors[name] ? 'border-red-500' : ''}`,
   });
 
   return (
@@ -210,7 +210,7 @@ export default function ProfilePage({ isDarkMode, toggleTheme }) {
                   {isEditing ? (
                     <div>
                       <Input {...field('name')} placeholder="Full name"
-                        className={`text-xl font-bold mb-1 dark:bg-gray-900 dark:border-gray-700 ${formik.touched.name && formik.errors.name ? 'border-red-500' : ''}`} />
+                        className={`text-xl font-bold mb-1 dark:bg-gray-900 dark:border-gray-700 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 ${formik.touched.name && formik.errors.name ? 'border-red-500' : ''}`} />
                       {formik.touched.name && formik.errors.name && (
                         <p className="text-red-500 text-xs mt-0.5">{formik.errors.name}</p>
                       )}
@@ -284,7 +284,7 @@ export default function ProfilePage({ isDarkMode, toggleTheme }) {
                       name="bio" value={formik.values.bio}
                       onChange={formik.handleChange} onBlur={formik.handleBlur}
                       rows={4}
-                      className={`w-full px-3 py-2 border rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white dark:border-gray-700 resize-none ${formik.touched.bio && formik.errors.bio ? 'border-red-500' : 'border-gray-300'}`}
+                      className={`w-full px-3 py-2 border rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white dark:border-gray-700 placeholder-gray-400 dark:placeholder-gray-500 resize-none ${formik.touched.bio && formik.errors.bio ? 'border-red-500' : 'border-gray-300'}`}
                     />
                     {formik.touched.bio && formik.errors.bio && (
                       <p className="text-red-500 text-xs mt-1">{formik.errors.bio}</p>
@@ -323,7 +323,7 @@ export default function ProfilePage({ isDarkMode, toggleTheme }) {
 
                 {/* Skill input — only in edit mode */}
                 {isEditing && (
-                  <div className="relative">
+                  <div className="relative z-10">
                     <div className="flex gap-2">
                       <input
                         value={skillInput}
@@ -332,7 +332,8 @@ export default function ProfilePage({ isDarkMode, toggleTheme }) {
                         onFocus={() => setShowSuggestions(true)}
                         onBlur={() => setTimeout(() => setShowSuggestions(false), 150)}
                         placeholder="Type a skill and press Enter…"
-                        className="flex-1 px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        autoComplete="off"
+                        className="flex-1 px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                       />
                       <button
                         type="button"
@@ -346,14 +347,14 @@ export default function ProfilePage({ isDarkMode, toggleTheme }) {
 
                     {/* Suggestions dropdown */}
                     {showSuggestions && suggestions.length > 0 && (
-                      <div className="absolute top-full left-0 right-0 mt-1 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-10 overflow-hidden">
-                        <p className="text-xs text-gray-400 px-3 pt-2 pb-1">Suggestions</p>
+                      <div className="absolute top-full left-0 right-0 mt-1 bg-white dark:bg-gray-950 border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl z-50 overflow-hidden max-h-48 overflow-y-auto">
+                        <p className="text-xs font-semibold text-gray-400 dark:text-gray-500 px-3 pt-2 pb-1 uppercase tracking-wide">Suggestions</p>
                         {suggestions.map(s => (
                           <button
                             key={s}
                             type="button"
                             onMouseDown={() => addSkill(s)}
-                            className="w-full text-left px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                            className="w-full text-left px-3 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/30 hover:text-blue-600 dark:hover:text-blue-400 transition-colors border-b border-gray-50 dark:border-gray-800 last:border-0"
                           >
                             {s}
                           </button>

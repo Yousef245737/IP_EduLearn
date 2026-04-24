@@ -73,6 +73,19 @@ exports.updateUser = async (req, res) => {
       updates.password = await bcrypt.hash(req.body.password, 10);
     }
 
+    // Guard: prevent downgrading an instructor who still has courses assigned
+    if (updates.role && updates.role !== 'instructor') {
+      const existing = await User.findById(req.params.id);
+      if (existing && existing.role === 'instructor') {
+        const assignedCourses = await Course.find({ instructorId: req.params.id }).select('title code');
+        if (assignedCourses.length > 0) {
+          return res.status(400).json({
+            message: `Cannot change role — this instructor is assigned to ${assignedCourses.length} course(s): ${assignedCourses.map(c => c.title).join(', ')}. Reassign or delete those courses first.`,
+          });
+        }
+      }
+    }
+
     const user = await User.findByIdAndUpdate(req.params.id, updates, { new: true, runValidators: true }).select('-password');
     if (!user) return res.status(404).json({ message: 'User not found' });
     res.json(user);

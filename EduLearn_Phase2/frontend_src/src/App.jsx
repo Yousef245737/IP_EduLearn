@@ -20,6 +20,7 @@ import SettingsPage      from './pages/SettingsPage';
 
 // Student extra pages
 import HelpPage          from './pages/HelpPage';
+import PastCoursesPage   from './pages/CoursesPage';
 
 // Admin pages (NEW)
 import AdminDashboard    from './pages/admin/AdminDashboard';
@@ -27,6 +28,7 @@ import AdminUsers        from './pages/admin/AdminUsers';
 import AdminCourses      from './pages/admin/AdminCourses';
 import AdminExams        from './pages/admin/AdminExams';
 import AdminMessages     from './pages/admin/AdminMessages';
+import AdminQuizzes      from './pages/admin/AdminQuizzes';
 
 // Instructor pages (NEW)
 import InstructorDashboard from './pages/instructor/InstructorDashboard';
@@ -117,6 +119,7 @@ function AppRoutes() {
       <Route path="/quiz"       element={<RequireAuth><QuizPage           {...themeProps} /></RequireAuth>} />
       <Route path="/settings"   element={<RequireAuth><SettingsPage       {...themeProps} /></RequireAuth>} />
       <Route path="/help"       element={<RequireAuth><HelpPage           {...themeProps} /></RequireAuth>} />
+      <Route path="/past-courses" element={<RequireAuth><PastCoursesPage    {...themeProps} /></RequireAuth>} />
 
       {/* ── Admin routes ── */}
       <Route path="/admin"               element={<RequireAdmin><AdminDashboard  {...themeProps} /></RequireAdmin>} />
@@ -124,6 +127,7 @@ function AppRoutes() {
       <Route path="/admin/courses"       element={<RequireAdmin><AdminCourses    {...themeProps} /></RequireAdmin>} />
       <Route path="/admin/exams"         element={<RequireAdmin><AdminExams      {...themeProps} /></RequireAdmin>} />
       <Route path="/admin/messages"      element={<RequireAdmin><AdminMessages   {...themeProps} /></RequireAdmin>} />
+      <Route path="/admin/quizzes"       element={<RequireAdmin><AdminQuizzes    {...themeProps} /></RequireAdmin>} />
 
       {/* ── Instructor routes ── */}
       <Route path="/instructor"              element={<RequireInstructor><InstructorDashboard {...themeProps} /></RequireInstructor>} />

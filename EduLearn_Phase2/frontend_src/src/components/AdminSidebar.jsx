@@ -1,7 +1,7 @@
 // src/components/AdminSidebar.jsx
 import { NavLink, useNavigate } from 'react-router-dom';
 import {
-  LayoutDashboard, Users, BookOpen, Moon, Sun, LogOut, ShieldCheck, Mail, Calendar,
+  LayoutDashboard, Users, BookOpen, Moon, Sun, LogOut, ShieldCheck, Mail, Calendar, FileText,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
@@ -11,6 +11,7 @@ const menuItems = [
   { id: 'courses',   label: 'Courses',   path: '/admin/courses',  icon: BookOpen        },
   { id: 'exams',     label: 'Exams',     path: '/admin/exams',    icon: Calendar        },
   { id: 'messages',  label: 'Messages',  path: '/admin/messages', icon: Mail            },
+  { id: 'quizzes',   label: 'Quizzes',   path: '/admin/quizzes',  icon: FileText        },
 ];
 
 export default function AdminSidebar({ isDarkMode, toggleTheme }) {

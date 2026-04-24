@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/input';
 import { BookOpen, Calendar, User, Award, Clock, Search, Eye, Plus, CheckCircle, Loader2 } from 'lucide-react';
 import Sidebar from '../components/Sidebar';
 import { coursesApi, usersApi } from '../hooks/useApi';
-
+ 
 export default function CoursesPage({ isDarkMode, toggleTheme }) {
   const navigate = useNavigate();
   const [courses,            setCourses]       = useState([]);
@@ -22,7 +22,7 @@ export default function CoursesPage({ isDarkMode, toggleTheme }) {
   const [selectedYear,       setYear]          = useState('all');
   const [selectedDepartment, setDepartment]    = useState('all');
   const [toast,              setToast]         = useState(null);
-
+ 
   useEffect(() => {
     Promise.all([coursesApi.getAll(), usersApi.getMyEnrollments()])
       .then(([allCourses, myEnrollments]) => {
@@ -40,12 +40,12 @@ export default function CoursesPage({ isDarkMode, toggleTheme }) {
       .catch(() => {})
       .finally(() => setLoading(false));
   }, []);
-
+ 
   const showToast = (msg, type = 'success') => {
     setToast({ msg, type });
     setTimeout(() => setToast(null), 3000);
   };
-
+ 
   const handleEnroll = async (courseId) => {
     setEnrolling(p => ({ ...p, [courseId]: true }));
     try {
@@ -59,7 +59,7 @@ export default function CoursesPage({ isDarkMode, toggleTheme }) {
       setEnrolling(p => ({ ...p, [courseId]: false }));
     }
   };
-
+ 
   const handleUnenroll = async (courseId) => {
     if (!window.confirm('Drop this course? Your progress will be lost.')) return;
     setEnrolling(p => ({ ...p, [courseId]: true }));
@@ -74,32 +74,33 @@ export default function CoursesPage({ isDarkMode, toggleTheme }) {
       setEnrolling(p => ({ ...p, [courseId]: false }));
     }
   };
-
+ 
   const filtered = courses.filter(c => {
     const q = searchQuery.toLowerCase();
-    const matchSearch = !q || c.title.toLowerCase().includes(q) || c.code.toLowerCase().includes(q) || c.instructor.toLowerCase().includes(q);
-    return matchSearch
-      && (selectedSemester === 'all' || c.semester   === selectedSemester)
-      && (selectedYear     === 'all' || c.year       === selectedYear)
-      && (selectedDepartment === 'all' || c.department === selectedDepartment);
+    return (
+      (!q || c.title.toLowerCase().includes(q) || c.code.toLowerCase().includes(q) || c.instructor.toLowerCase().includes(q)) &&
+      (selectedSemester   === 'all' || c.semester   === selectedSemester) &&
+      (selectedYear       === 'all' || c.year       === selectedYear) &&
+      (selectedDepartment === 'all' || c.department === selectedDepartment)
+    );
   });
-
+ 
   const semesters   = ['all', ...new Set(courses.map(c => c.semester))];
   const years       = ['all', ...new Set(courses.map(c => c.year))];
   const departments = ['all', ...new Set(courses.map(c => c.department))];
-
+ 
   return (
     <div className={`min-h-screen flex ${isDarkMode ? 'dark bg-gray-900' : 'bg-gray-50'}`}>
       <Sidebar isDarkMode={isDarkMode} toggleTheme={toggleTheme} />
-
+ 
       <main className="flex-1 overflow-y-auto">
         <header className="bg-white dark:bg-gray-950 border-b border-gray-200 dark:border-gray-800 px-6 py-4">
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Courses</h1>
           <p className="text-sm text-gray-500 dark:text-gray-400">Browse and enroll in available courses</p>
         </header>
-
+ 
         <div className="p-6 space-y-6">
-
+ 
           {/* Stats */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             {[
@@ -120,7 +121,7 @@ export default function CoursesPage({ isDarkMode, toggleTheme }) {
               </Card>
             ))}
           </div>
-
+ 
           {/* Filters */}
           <Card className="bg-white dark:bg-gray-950 border-gray-200 dark:border-gray-800">
             <CardHeader>
@@ -132,20 +133,20 @@ export default function CoursesPage({ isDarkMode, toggleTheme }) {
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
                   <Input placeholder="Search courses..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)}
-                    className="pl-10 dark:bg-gray-900 dark:border-gray-700 dark:text-white" />
+                    className="pl-10 dark:bg-gray-900 dark:border-gray-700 dark:text-white placeholder-gray-400 dark:placeholder-gray-500" />
                 </div>
                 {[
-                  { val: selectedSemester, set: setSemester, opts: semesters,   label: 'All Semesters' },
-                  { val: selectedYear,     set: setYear,     opts: years,       label: 'All Years'     },
+                  { val: selectedSemester,   set: setSemester,   opts: semesters,   label: 'All Semesters'   },
+                  { val: selectedYear,       set: setYear,       opts: years,       label: 'All Years'       },
                   { val: selectedDepartment, set: setDepartment, opts: departments, label: 'All Departments' },
                 ].map(({ val, set, opts, label }) => (
                   <Select key={label} value={val} onValueChange={set}>
                     <SelectTrigger className="dark:bg-gray-900 dark:border-gray-700 dark:text-white">
                       <SelectValue placeholder={label} />
                     </SelectTrigger>
-                    <SelectContent className="bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700">
+                    <SelectContent className="bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700 z-[9999]">
                       {opts.map(o => (
-                        <SelectItem key={o} value={o} className="text-gray-900 dark:text-white">
+                        <SelectItem key={o} value={o} className="text-gray-900 dark:text-white cursor-pointer">
                           {o === 'all' ? label : o}
                         </SelectItem>
                       ))}
@@ -155,7 +156,7 @@ export default function CoursesPage({ isDarkMode, toggleTheme }) {
               </div>
             </CardContent>
           </Card>
-
+ 
           {/* Cards */}
           {loading ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -184,11 +185,11 @@ export default function CoursesPage({ isDarkMode, toggleTheme }) {
                 const isBusy     = !!enrolling[course._id];
                 const myEnroll   = enrollmentMap[course._id];
                 const progress   = myEnroll?.progress ?? 0;
-
+ 
                 return (
                   <Card key={course._id}
                     className={`bg-white dark:bg-gray-950 border-gray-200 dark:border-gray-800 hover:shadow-lg transition-shadow duration-300 flex flex-col ${isEnrolled ? 'border-l-4 border-l-green-500' : ''}`}>
-
+ 
                     <CardHeader>
                       <div className="flex items-start justify-between gap-2">
                         <div className="flex-1 min-w-0">
@@ -202,7 +203,7 @@ export default function CoursesPage({ isDarkMode, toggleTheme }) {
                         )}
                       </div>
                     </CardHeader>
-
+ 
                     <CardContent className="space-y-3 flex-1">
                       <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
                         <User className="w-4 h-4 flex-shrink-0" /><span className="truncate">{course.instructor}</span>
@@ -217,13 +218,10 @@ export default function CoursesPage({ isDarkMode, toggleTheme }) {
                       <div className="pt-1">
                         <Badge className="bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400">{course.department}</Badge>
                       </div>
-
-                      {/* Progress bar — enrolled courses only */}
                       {isEnrolled && myEnroll && (
                         <div className="pt-1">
                           <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400 mb-1">
-                            <span>Progress</span>
-                            <span>{progress}%</span>
+                            <span>Progress</span><span>{progress}%</span>
                           </div>
                           <div className="h-1.5 rounded-full bg-gray-200 dark:bg-gray-700 overflow-hidden">
                             <div className="h-full bg-green-500 rounded-full transition-all" style={{ width: `${progress}%` }} />
@@ -231,24 +229,23 @@ export default function CoursesPage({ isDarkMode, toggleTheme }) {
                         </div>
                       )}
                     </CardContent>
-
+ 
                     <CardFooter className="flex gap-2 pt-2">
                       <Button variant="outline" size="sm"
-                        className="flex-1 dark:border-gray-700 dark:text-gray-300"
+                        className="flex-1 border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white transition-colors"
                         onClick={() => navigate(`/course/${course._id}`)}>
                         <Eye className="w-4 h-4 mr-1.5" /> View
                       </Button>
-
                       {isEnrolled ? (
                         <Button variant="outline" size="sm" disabled={isBusy}
-                          className="flex-1 border-red-200 text-red-600 hover:bg-red-50 dark:border-red-800 dark:text-red-400 dark:hover:bg-red-900/20"
+                          className="flex-1 border-red-200 text-red-600 hover:bg-red-50 dark:border-red-800 dark:text-red-400 dark:hover:bg-red-900/20 transition-colors"
                           onClick={() => handleUnenroll(course._id)}>
                           {isBusy && <Loader2 className="w-4 h-4 mr-1.5 animate-spin" />}
                           Drop
                         </Button>
                       ) : (
                         <Button size="sm" disabled={isBusy}
-                          className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
+                          className="flex-1 bg-blue-600 hover:bg-blue-700 text-white transition-colors"
                           onClick={() => handleEnroll(course._id)}>
                           {isBusy ? <Loader2 className="w-4 h-4 mr-1.5 animate-spin" /> : <Plus className="w-4 h-4 mr-1.5" />}
                           Enroll
@@ -262,7 +259,7 @@ export default function CoursesPage({ isDarkMode, toggleTheme }) {
           )}
         </div>
       </main>
-
+ 
       {toast && (
         <div className={`fixed bottom-6 right-6 z-50 px-5 py-3 rounded-xl shadow-lg text-sm font-medium
           ${toast.type === 'error' ? 'bg-red-600 text-white' : 'bg-green-600 text-white'}`}>
